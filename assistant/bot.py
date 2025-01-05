@@ -1,45 +1,5 @@
-from internal.addressbook import AddressBook
 from internal.record import Record
-
-def load_contacts():
-    contacts = AddressBook()
-    try:
-        with open("./assistant/storage/phonebook.txt", "r") as file:
-            for line in file:
-                fields = line.strip().split(",")
-                if len(fields) < 3:
-                    print("Skipping invalid contact: {}".format(line))
-                    continue
-                name = fields[0].strip()
-                phones = [field.strip() for field in fields[1:-1] if field.strip()]
-                birthday = fields[-1].strip()
-                contact = Record(name)
-                for phone in phones:
-                    try:
-                        contact.add_phone(phone)
-                    except ValueError as e:
-                        print(f"Skipping invalid phone '{phone}': {e}")
-                if birthday != "None":
-                    contact.set_birthday(birthday)
-                contacts.add_record(contact)
-            return contacts
-    except FileNotFoundError:
-        print("No contacts found. Please add new contact.")
-        return contacts
-
-def record_contacts(contacts):
-  with open("./assistant/storage/phonebook.txt", "w") as file:
-    try :
-        print("Saving contacts...")
-        if len(contacts) == 0:
-            print("No contacts to save.")
-            return
-        records = "\n".join(f"{value.get_name()}, {', '.join(phone.get_value() for phone in value.get_phones())}, {value.get_birthday()}" for key, value in contacts.items())
-        file.write(records)
-    except Exception as e:
-        print(f"Error saving contacts: {e}")
-    finally:
-        contacts = {}
+from filer.filer import load_contacts, record_contacts
 
 def parse_input(user_input):
     if not user_input:

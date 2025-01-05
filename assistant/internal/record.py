@@ -1,3 +1,4 @@
+import copy
 from .name import Name
 from .phone import Phone
 from .birthday import Birthday
@@ -8,6 +9,12 @@ class Record():
         self.name = Name(name)
         self.phones = []
         self.birthday = None
+    
+    def __getstate__(self):
+        return copy.deepcopy(self.__dict__)
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
 
     def get_name(self):
         return self.name

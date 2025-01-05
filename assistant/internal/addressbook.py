@@ -1,4 +1,5 @@
 from collections import UserDict
+import copy
 from .errorhandler import input_error
 from .birthday import Birthday
 
@@ -8,7 +9,14 @@ class AddressBook(UserDict):
         if not self.data:
             return "No contacts found."
         return "Contacts:\n" + "\n".join(f"- {record}" for name, record in self.data.items())
+    
+    def __getstate__(self):
+        return copy.deepcopy(self.__dict__)
 
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+    
+    @input_error
     def add_record(self, contact):
         if not contact:
             raise ValueError("No contact provided.")
@@ -64,7 +72,16 @@ class AddressBook(UserDict):
     
     @input_error
     def add_birthday(self, name, date):
+        if not name:
+            raise ValueError("Name cannot be empty.")
+        
         contact = self.find(name)
+        if not contact:
+            raise KeyError(f"Contact '{name}' not found.")
+        
+        if not date:
+            raise ValueError("Birthday cannot be empty.")
+        
         contact.set_birthday(date)
         self.data[name.casefold()] = contact
         return f"Birthday for contact {contact.get_name()} set to {date}."
